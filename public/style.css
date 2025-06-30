@@ -1,137 +1,303 @@
-/* Reset default styles for consistency */
+/* Import Montserrat font */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
+
+/* Reset styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Body styling for background and centering */
+/* Animated gradient background */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96c93d);
+    background-size: 400%;
+    animation: gradientAnimation 15s ease infinite;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    overflow: hidden;
 }
 
-/* Container for forms */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Container */
 .container {
-    max-width: 400px;
-    width: 100%;
-    padding: 20px;
+    position: relative;
+    width: 800px;
+    max-width: 100%;
+    min-height: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
 }
 
-/* Form styling */
+/* Form container */
+.form-container {
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: transform 0.6s ease-in-out;
+}
+
+/* Forms */
 .form {
-    display: none; /* Hide forms by default */
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.form.active {
-    display: block; /* Show active form */
-}
-
-/* Form heading */
-.form h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* Form labels and inputs */
-.form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #555;
-}
-
-.form input[type="text"],
-.form input[type="password"] {
+    position: absolute;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    height: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 15px 0 0 15px;
+    transition: all 0.6s ease-in-out;
+}
+
+.login-form {
+    transform: translateX(0);
+    opacity: 1;
+    z-index: 2;
+}
+
+.signup-form {
+    transform: translateX(-100%);
+    opacity: 0;
+    z-index: 1;
+}
+
+.container.signup-active .login-form {
+    transform: translateX(100%);
+    opacity: 0;
+    z-index: 1;
+    transition: all 0.6s ease-in-out;
+}
+
+.container.signup-active .signup-form {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 2;
+    transition: all 0.6s ease-in-out;
+}
+
+/* Overlay container */
+.overlay-container {
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay {
+    width: 200%;
+    height: 100%;
+    position: relative;
+    left: -100%;
+    display: flex;
+    transition: transform 0.6s ease-in-out;
+}
+
+.container.signup-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.container.signup-active .overlay {
+    transform: translateX(50%);
+}
+
+/* Overlay panels */
+.overlay-panel {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background: linear-gradient(to right, #ff6b6b, #ff416c);
+    color: #fff;
+    transition: all 0.6s ease-in-out;
+}
+
+.overlay-login {
+    transform: translateX(-20%);
+    opacity: 0;
+}
+
+.overlay-signup {
+    transform: translateX(0);
+    opacity: 1;
+    right: 0;
+}
+
+.container.signup-active .overlay-login {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.container.signup-active .overlay-signup {
+    transform: translateX(20%);
+    opacity: 0;
+}
+
+/* Form elements */
+h2 {
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+span {
+    color: #fff;
+    font-size: 14px;
+    margin: 15px 0;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
     font-size: 16px;
 }
 
-/* Password container for eye icon */
+input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+input:focus {
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    outline: none;
+}
+
+/* Password container */
 .password-container {
     position: relative;
+    width: 100%;
 }
 
 .password-container input {
-    padding-right: 40px; /* Space for eye icon */
+    padding-right: 40px;
 }
 
 .eye {
     position: absolute;
-    right: 10px;
-    top: 35%;
+    right: 12px;
+    top: 25%;
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 18px;
+    color: #fff;
+    transition: color 0.3s;
 }
 
-/* Button styling */
-.form button {
+.eye:hover {
+    color: #ff6b6b;
+}
+
+/* Buttons */
+button {
     width: 100%;
     padding: 12px;
-    background-color: #007bff;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.form button:hover {
-    background-color: #0056b3;
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
 }
 
-/* Toggle link styling */
-.toggle {
-    text-align: center;
-    margin-top: 15px;
+button:active {
+    transform: scale(0.95);
 }
 
-.toggle a {
-    color: #007bff;
+.overlay-btn {
+    background: transparent;
+    border: 1px solid #fff;
+    width: auto;
+    padding: 10px 30px;
+}
+
+/* Social links */
+.social-links {
+    margin: 20px 0;
+}
+
+.social-links a {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 8px;
+    height: 40px;
+    width: 40px;
+    color: #fff;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.social-links a:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Forgot password */
+.forgot-password {
+    color: #fff;
+    font-size: 14px;
     text-decoration: none;
-    cursor: pointer;
+    margin: 15px 0;
 }
 
-.toggle a:hover {
-    text-decoration: underline;
+.forgot-password:hover {
+    color: #ff6b6b;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
 }
 
 /* Responsive design */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .container {
-        padding: 10px;
+        width: 100%;
+        min-height: 400px;
     }
 
-    .form {
+    .form, .overlay-panel {
         padding: 20px;
     }
 
-    .form h2 {
+    h2 {
         font-size: 24px;
     }
 
-    .form input[type="text"],
-    .form input[type="password"] {
-        font-size: 14px;
-    }
-
-    .form button {
+    input, button {
         font-size: 14px;
     }
 }

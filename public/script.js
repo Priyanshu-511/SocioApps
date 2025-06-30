@@ -1,19 +1,20 @@
-function togglePassword(inputId) {
-    const passwordInput = document.getElementById(inputId);
-    const eyeIcon = passwordInput.nextElementSibling;
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        eyeIcon.textContent = "🙈";
+function showForm(formId) {
+    const container = document.getElementById('container');
+    if (formId === 'signup-form') {
+        container.classList.add('signup-active');
     } else {
-        passwordInput.type = "password";
-        eyeIcon.textContent = "👁️";
+        container.classList.remove('signup-active');
     }
 }
 
-function showForm(formId) {
-    const forms = document.querySelectorAll(".form");
-    forms.forEach(form => {
-        form.classList.remove("active");
-    });
-    document.getElementById(formId).classList.add("active");
+function togglePassword(inputId) {
+    const passwordInput = document.getElementById(inputId);
+    const eyeIcon = passwordInput.nextElementSibling;
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.textContent = '🙈';
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.textContent = '👁️';
+    }
 }
