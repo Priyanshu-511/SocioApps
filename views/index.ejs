@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <title>Login or Signup</title>
+</head>
+<body>
+    <div class="container">
+        <div id="signup-form" class="form">
+            <h2>Signup</h2>
+            <form action="/signup" method="POST">
+                <label for="signup-name">Name:</label>
+                <input type="text" id="signup-name" name="name" required>
+                
+                <label for="signup-username">Username:</label>
+                <input type="text" id="signup-username" name="username" required>
+                
+                <label for="signup-password">Password:</label>
+                <div class="password-container">
+                    <input type="password" id="signup-password" name="password" required>
+                    <span class="eye" onclick="togglePassword('signup-password')">👁️</span>
+                </div>
+                
+                <button type="submit">Signup</button>
+            </form>
+            <div class="toggle">
+                <a onclick="showForm('login-form')">Already have an account? Login</a>
+            </div>
+        </div>
+        
+        <div id="login-form" class="form active">
+            <h2>Login</h2>
+            <form action="/login" method="POST">
+                <label for="login-username">Username:</label>
+                <input type="text" id="login-username" name="username" required>
+                
+                <label for="login-password">Password:</label>
+                <div class="password-container">
+                    <input type="password" id="login-password" name="password" required>
+                    <span class="eye" onclick="togglePassword('login-password')">👁️</span>
+                </div>
+                
+                <button type="submit">Login</button>
+            </form>
+            <div class="toggle">
+                <a onclick="showForm('signup-form')">Don't have an account? Signup</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>
