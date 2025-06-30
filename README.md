@@ -1,2 +1,4 @@
 # SocioApps
-this is practice about how social apps working
+This is practice about how social apps working
+
+ ## start with create server
