@@ -1,11 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Single Page Transitions</title>
+  <link rel="stylesheet" href="/home.css" />
 </head>
 <body>
-    
+  <nav>
+    <button onclick="showSection('home')">Home</button>
+    <button onclick="showSection('about')">About</button>
+    <button onclick="showSection('contact')">Contact</button>
+    <button onclick="showSection('projects')">Projects</button>
+  </nav>
+
+  <div class="sections">
+    <section id="home">Welcome to Home</section>
+    <section id="about">All About Me</section>
+    <section id="contact">Let's Connect</section>
+    <section id="projects">My Cool Projects</section>
+  </div>
+
+  <script src="/home.js"></script>
 </body>
 </html>
