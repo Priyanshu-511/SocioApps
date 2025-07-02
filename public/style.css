@@ -8,23 +8,15 @@
     box-sizing: border-box;
 }
 
-/* Animated gradient background */
+/* Static gradient background */
 body {
     font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96c93d);
-    background-size: 400%;
-    animation: gradientAnimation 15s ease infinite;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     overflow: hidden;
-}
-
-@keyframes gradientAnimation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
 
 /* Container */
