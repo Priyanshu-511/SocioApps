@@ -9,19 +9,49 @@
 <body>
   <nav>
     <button onclick="showSection('home')">Home</button>
-    <button onclick="showSection('post')">Post</button>
+    <button onclick="showSection('search')">Search</button>
     <button onclick="showSection('upload')">Upload</button>
     <button onclick="showSection('account')">Account</button>
     <button  onclick="window.location.href='/'">Logout</button>
   </nav>
 
   <div class="sections">
-    <section id="home">Home</section>
-    <section id="post">Post</section>
-    <section id="upload">Upload</section>
-    <section id="account">Account</section>
+    <section id="home">
+      <h2>Recent Uploads</h2>
+        <% if (files && files.length > 0) { %>
+            <% files.forEach(file => { %>
+                <% if (file.type === 'txt') { %>
+                    <p><a href="<%= file.url %>"><%= file.name %></a> (Text)</p>
+                <% } else if (file.type === 'mp4') { %>
+                    <p><video src="<%= file.url %>" controls width="300">Video: <%= file.name %></video></p>
+                <% } else { %>
+                    <p><img src="<%= file.url %>" alt="<%= file.name %>" width="300"> (Image)</p>
+                <% } %>
+            <% }) %>
+        <% } else { %>
+            <p>No uploads yet</p>
+        <% } %>
+    </section>
+    <section id="search"></section>
+    <section id="upload">        
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <button type="submit">Upload</button>
+            <input type="file" name="file" accept="image/*,video/mp4,text/plain"><br>
+            <input type="text" name="title" placeholder="Title" required><br>
+            <textarea name="description" placeholder="Description" required></textarea><br>
+        </form>
+    </section>
+    <section id="account">
+
+       <h6><%= message %></h6>
+        <% if (error) { %>
+            <p><%= error %></p>
+        <% } %>
+
+    </section>
   </div>
 
   <script src="/home.js"></script>
+  <script src="/work.js"></script>
 </body>
 </html>
