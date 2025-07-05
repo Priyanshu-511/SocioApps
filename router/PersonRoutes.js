@@ -183,4 +183,100 @@ router.post('/upload', jsonmiddleAuth, upload.single('file'), async (req, res) =
     }
 });
 
+router.get('/search', async (req, res) => {
+  try {
+    const { query, type } = req.query;
+    let results = [];
+    
+    if (query) {
+      if (type === 'users' || !type) {
+        // Search for users by username or email
+        const users = await User.find({
+          $or: [
+            { username: { $regex: query, $options: 'i' } },
+            { email: { $regex: query, $options: 'i' } }
+          ]
+        }).select('username email profilePicture');
+        
+        results = users.map(user => ({
+          type: 'user',
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          profilePicture: user.profilePicture
+        }));
+      }
+      
+      if (type === 'uploads' || !type) {
+        // Search for uploads by title or description
+        const uploads = await Upload.find({
+          $or: [
+            { title: { $regex: query, $options: 'i' } },
+            { description: { $regex: query, $options: 'i' } }
+          ]
+        }).populate('uploadedBy', 'username');
+        
+        const uploadResults = uploads.map(upload => ({
+          type: 'upload',
+          id: upload._id,
+          title: upload.title,
+          description: upload.description,
+          url: upload.url,
+          fileType: upload.fileType,
+          uploadedBy: upload.uploadedBy.username,
+          uploadedAt: upload.uploadedAt
+        }));
+        
+        results = [...results, ...uploadResults];
+      }
+    }
+    
+    res.json({ success: true, results });
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ success: false, error: 'Search failed' });
+  }
+});
+
+// Get user profile and their uploads
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Get user details
+    const user = await User.findById(userId).select('username email profilePicture');
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    
+    // Get user's uploads
+    const uploads = await Upload.find({ uploadedBy: userId })
+      .sort({ uploadedAt: -1 })
+      .limit(20);
+    
+    res.json({
+      success: true,
+      user: {
+        username: user.username,
+        email: user.email,
+        profilePicture: user.profilePicture
+      },
+      uploads: uploads.map(upload => ({
+        id: upload._id,
+        title: upload.title,
+        description: upload.description,
+        url: upload.url,
+        fileType: upload.fileType,
+        uploadedAt: upload.uploadedAt
+      }))
+    });
+  } catch (error) {
+    console.error('User profile error:', error);
+    res.status(500).json({ success: false, error: 'Failed to load user profile' });
+  }
+});
+
+
+
+
 module.exports = router;

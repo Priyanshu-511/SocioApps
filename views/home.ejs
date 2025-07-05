@@ -32,10 +32,35 @@
             <p>No uploads yet</p>
         <% } %>
     </section>
-    <section id="search"></section>
+    <section id="search">
+      <h2>Search Users & Uploads</h2>
+  
+  <div class="search-container">
+    <form id="searchForm">
+      <input type="text" id="searchInput" placeholder="Search users or uploads..." required>
+      <select id="searchType">
+        <option value="">All</option>
+        <option value="users">Users Only</option>
+        <option value="uploads">Uploads Only</option>
+      </select>
+      <button type="submit">Search</button>
+    </form>
+  </div>
+  
+  <div id="searchResults" style="display: none;">
+    <h3>Search Results</h3>
+    <div id="resultsContainer"></div>
+  </div>
+  
+  <div id="userProfile" style="display: none;">
+    <button onclick="showSearchResults()">← Back to Search</button>
+    <h3 id="profileUsername"></h3>
+    <div id="userUploads"></div>
+  </div>
+    </section>
     <section id="upload">        
         <form action="/upload" method="POST" enctype="multipart/form-data">
-          <button type="submit">Upload</button>
+          <button type="submit">Upload</button> <br>
             <input type="file" name="file" accept="image/*,video/mp4,text/plain"><br>
             <input type="text" name="title" placeholder="Title" required><br>
             <textarea name="description" placeholder="Description" required></textarea><br>
