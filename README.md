@@ -55,7 +55,7 @@ SocioApps/
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository
+### 1. How to run it.
 
 ```bash
 git clone https://github.com/yourusername/SocioApps.git
@@ -73,8 +73,12 @@ JWT_SECRET=your_jwt_secret
 
 - Visit http://localhost:5000 in your browser
 
-### 2. Demo:
+### 2. 🔗 Live Demo
+
 Deployed at 
 ```bash
 https://socioapps.onrender.com/
 ```
+
+
+### note: It may be take more time to start due to inactivity timeout on render
