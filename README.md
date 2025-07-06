@@ -76,9 +76,8 @@ JWT_SECRET=your_jwt_secret
 ### 2. 🔗 Live Demo
 
 Deployed at 
-```bash
-https://socioapps.onrender.com/
-```
+
+- visit https://socioapps.onrender.com/ on your browser
 
 
 ### note: It may be take more time to start due to inactivity timeout on render
