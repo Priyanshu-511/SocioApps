@@ -55,4 +55,10 @@ cd SocioApps
 npm install
 node server.js
 ```
+then setup your enviroment variable
 
+### 2. Demo:
+Deployed at 
+```bash
+https://socioapps.onrender.com/
+```
