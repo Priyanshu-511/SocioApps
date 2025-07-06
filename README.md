@@ -6,11 +6,15 @@
 
 ## 🧠 Features
 
-- User registration and login
-- JWT authentication for route protection
-- Express server setup
-- Clean project structure
-- Easy to extend with more social features
+- ✅ User registration and login
+
+- 🔐 JWT-based authentication and route protection
+
+- 🧰 Modular and clean project structure
+
+- 🚀 Easy to extend with likes, comments, posts, and more
+
+- 🖥️ Simple EJS-based views (no frontend framework required)
 
 ---
 
@@ -21,7 +25,7 @@
 - **jsonwebtoken** – JWT implementation for token-based authentication
 - **bcryptjs** – For password hashing
 - **dotenv** – For managing environment variables
-
+- **EJS** - View templating engine
 ---
 
 ## 📁 Project Structure
@@ -59,11 +63,18 @@ cd SocioApps
 npm install
 node server.js
 ```
-must have to setup your enviroment file configuration
+
+must have to setup your enviroment file configuration by
+
+```env
+PORT=5000
+JWT_SECRET=your_jwt_secret
+```
+
+- Visit http://localhost:5000 in your browser
 
 ### 2. Demo:
 Deployed at 
 ```bash
 https://socioapps.onrender.com/
 ```
-
