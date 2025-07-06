@@ -59,7 +59,7 @@ cd SocioApps
 npm install
 node server.js
 ```
-must have to setup your enviroment variable
+must have to setup your enviroment file configuration
 
 ### 2. Demo:
 Deployed at 
