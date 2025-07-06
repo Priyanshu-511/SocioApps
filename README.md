@@ -37,9 +37,13 @@ SocioApps/
 │ └── authMiddleware.js # JWT verification
 ├── models/
 │ └── userModel.js # In-memory user model or schema
+├── views
+│ └── index.ejs
+│ └── HOME.ejs
 ├── .env # Environment variables
 ├── .gitignore
 └── README.md
+
 ```
 
 
@@ -55,10 +59,11 @@ cd SocioApps
 npm install
 node server.js
 ```
-then setup your enviroment variable
+must have to setup your enviroment variable
 
 ### 2. Demo:
 Deployed at 
 ```bash
 https://socioapps.onrender.com/
 ```
+
