@@ -52,4 +52,7 @@ SocioApps/
 ```bash
 git clone https://github.com/yourusername/SocioApps.git
 cd SocioApps
+npm install
+node server.js
 ```
+
