@@ -17,62 +17,689 @@
 
   <div class="sections">
     <section id="home">
-      <h2>Recent Uploads</h2>
+      <h2>Latest Uploads from Community</h2>
         <% if (files && files.length > 0) { %>
             <% files.forEach(file => { %>
-                <% if (file.type === 'txt') { %>
-                    <p><a href="<%= file.url %>"><%= file.name %></a> (Text)</p>
-                <% } else if (file.type === 'mp4') { %>
-                    <p><video src="<%= file.url %>" controls width="300">Video: <%= file.name %></video></p>
-                <% } else { %>
-                    <p><img src="<%= file.url %>" alt="<%= file.name %>" width="300"> (Image)</p>
-                <% } %>
+                <div class="upload-item">
+                    <div class="upload-header">
+                        <h3><%= file.title %></h3>
+                        <span class="uploader">by <%= file.userId.name %></span>
+                    </div>
+                    <p class="description"><%= file.description %></p>
+                    
+                    <div class="file-content">
+                        <% if (file.fileType === 'txt') { %>
+                            <div class="file-preview">
+                                <p>📄 <a href="<%= file.fileUrl %>" target="_blank"><%= file.filename %></a></p>
+                                <span class="file-type">Text File</span>
+                            </div>
+                        <% } else if (file.fileType === 'mp4') { %>
+                            <div class="file-preview">
+                                <video src="<%= file.fileUrl %>" controls width="300" preload="metadata">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <span class="file-type">Video</span>
+                            </div>
+                        <% } else if (file.fileType === 'jpg' || file.fileType === 'jpeg' || file.fileType === 'png') { %>
+                            <div class="file-preview">
+                                <img src="<%= file.fileUrl %>" alt="<%= file.filename %>" width="300" loading="lazy">
+                                <span class="file-type">Image</span>
+                            </div>
+                        <% } else { %>
+                            <div class="file-preview">
+                                <p>📎 <a href="<%= file.fileUrl %>" target="_blank"><%= file.filename %></a></p>
+                                <span class="file-type">File</span>
+                            </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="upload-meta">
+                        <small>Uploaded on: <%= new Date(file.createdAt).toLocaleString() %></small>
+                    </div>
+                </div>
+                <hr>
             <% }) %>
         <% } else { %>
-            <p>No uploads yet</p>
+            <div class="no-uploads">
+                <p>No uploads yet from the community.</p>
+                <p><a href="#" onclick="showSection('upload')">Be the first to upload!</a></p>
+            </div>
         <% } %>
     </section>
+    
     <section id="search">
       <h2>Search Users & Uploads</h2>
   
-  <div class="search-container">
-    <form id="searchForm">
-      <input type="text" id="searchInput" placeholder="Search users or uploads..." required>
-      <select id="searchType">
-        <option value="">All</option>
-        <option value="users">Users Only</option>
-        <option value="uploads">Uploads Only</option>
-      </select>
-      <button type="submit">Search</button>
-    </form>
-  </div>
-  
-  <div id="searchResults" style="display: none;">
-    <h3>Search Results</h3>
-    <div id="resultsContainer"></div>
-  </div>
-  
-  <div id="userProfile" style="display: none;">
-    <button onclick="showSearchResults()">← Back to Search</button>
-    <h3 id="profileUsername"></h3>
-    <div id="userUploads"></div>
-  </div>
-    </section>
-    <section id="upload">        
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-          <button type="submit">Upload</button> <br>
-            <input type="file" name="file" accept="image/*,video/mp4,text/plain"><br>
-            <input type="text" name="title" placeholder="Title" required><br>
-            <textarea name="description" placeholder="Description" required></textarea><br>
+      <div class="search-container">
+        <form id="searchForm">
+          <input type="text" id="searchInput" placeholder="Search users or uploads..." required>
+          <select id="searchType">
+            <option value="">All</option>
+            <option value="users">Users Only</option>
+            <option value="uploads">Uploads Only</option>
+          </select>
+          <button type="submit">Search</button>
         </form>
+      </div>
+  
+      <div id="searchResults" style="display: none;">
+        <h3>Search Results</h3>
+        <div id="resultsContainer"></div>
+      </div>
+  
+      <div id="userProfile" style="display: none;">
+        <button onclick="showSearchResults()">← Back to Search</button>
+        <h3 id="profileUsername"></h3>
+        <div id="userUploads"></div>
+      </div>
+      <style>
+        #search {
+    display: none;
+    padding: 40px;
+    font-size: 26px;
+    color: #fff;
+    position: static;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    transform: translateX(100%);
+    transition: transform 0.5s ease-in-out;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+#search.active {
+    display: block;
+    transform: translateX(0);
+}
+
+#search:not(.active) {
+    transform: translateX(-100%);
+}
+
+#search h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.search-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+    text-align: center;
+}
+
+#searchForm {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#searchInput {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    min-width: 200px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#searchInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.5);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#searchType {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#searchType:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.5);
+}
+
+#searchForm button {
+    padding: 12px 30px;
+    background: linear-gradient(225deg, #ff6b6b, #4ecdc4);
+    border: 1px solid #fff;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+#searchForm button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+#searchForm button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+}
+
+#searchResults, #userProfile {
+    max-width: 800px;
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+#searchResults h3, #userProfile h3 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+#resultsContainer, #userUploads {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #fff;
+    text-align: center;
+}
+
+#userProfile button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(225deg, #ff6b6b, #4ecdc4);
+    border: 1px solid #fff;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#userProfile button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+#userProfile button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+    #search {
+        padding: 25px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    #search h2 {
+        font-size: 28px;
+        text-align: center;
+    }
+
+    .search-container {
+        padding: 15px;
+        text-align: center;
+    }
+
+    #searchForm {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #searchInput, #searchType, #searchForm button {
+        width: 100%;
+        max-width: 350px;
+        text-align: center;
+    }
+
+    #searchResults h3, #userProfile h3 {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    #resultsContainer, #userUploads {
+        font-size: 16px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    #search {
+        padding: 20px;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    #search h2 {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    #searchInput, #searchType, #searchForm button {
+        font-size: 14px;
+        padding: 10px 15px;
+        text-align: center;
+    }
+
+    #searchResults h3, #userProfile h3 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    #resultsContainer, #userUploads {
+        font-size: 14px;
+        text-align: center;
+    }
+
+    #userProfile button {
+        font-size: 12px;
+        padding: 8px 16px;
+        text-align: center;
+    }
+}
+      </style>
     </section>
+    
+    <section id="upload">
+        <h2>Upload New File</h2>
+        <div class="upload-container">
+            <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="form-group">
+                    <label for="file">Choose File:</label>
+                    <input type="file" 
+                           name="file" 
+                           id="file"
+                           accept="image/*,video/mp4,text/plain" 
+                           required>
+                    <small class="file-info">Supported formats: Images (JPG, PNG), Videos (MP4), Text files</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" 
+                           name="title" 
+                           id="title"
+                           placeholder="Enter a title for your upload" 
+                           required
+                           maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea name="description" 
+                              id="description"
+                              placeholder="Describe your upload..." 
+                              required
+                              maxlength="500"
+                              rows="4"></textarea>
+                    <small class="char-count">0/500 characters</small>
+                </div>
+                
+                <div class="file-preview" id="filePreview" style="display: none;">
+                    <h4>Preview:</h4>
+                    <div id="previewContent"></div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="upload-btn">
+                        <span class="btn-text">Upload File</span>
+                        <span class="btn-loading" style="display: none;">Uploading...</span>
+                    </button>
+                    <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
+                </div>
+            </form>
+        </div>
+        
+        <script>
+            // File preview functionality
+            document.getElementById('file').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const preview = document.getElementById('filePreview');
+                const previewContent = document.getElementById('previewContent');
+                
+                if (file) {
+                    preview.style.display = 'block';
+                    previewContent.innerHTML = '';
+                    
+                    if (file.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(file);
+                        img.style.maxWidth = '200px';
+                        img.style.maxHeight = '200px';
+                        img.onload = () => URL.revokeObjectURL(img.src);
+                        previewContent.appendChild(img);
+                    } else if (file.type === 'video/mp4') {
+                        const video = document.createElement('video');
+                        video.src = URL.createObjectURL(file);
+                        video.controls = true;
+                        video.style.maxWidth = '200px';
+                        video.style.maxHeight = '200px';
+                        video.onloadeddata = () => URL.revokeObjectURL(video.src);
+                        previewContent.appendChild(video);
+                    } else {
+                        previewContent.innerHTML = `<p>📄 ${file.name}</p><p>Size: ${(file.size / 1024).toFixed(1)} KB</p>`;
+                    }
+                } else {
+                    preview.style.display = 'none';
+                }
+            });
+            
+            // Character counter for description
+            document.getElementById('description').addEventListener('input', function(e) {
+                const count = e.target.value.length;
+                const counter = document.querySelector('.char-count');
+                counter.textContent = `${count}/500 characters`;
+                
+                if (count > 450) {
+                    counter.style.color = '#ff6b6b';
+                } else {
+                    counter.style.color = '#666';
+                }
+            });
+            
+            // Form submission with loading state
+            document.getElementById('uploadForm').addEventListener('submit', function(e) {
+                const submitBtn = document.querySelector('.upload-btn');
+                const btnText = document.querySelector('.btn-text');
+                const btnLoading = document.querySelector('.btn-loading');
+                
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline';
+                submitBtn.disabled = true;
+            });
+            
+            // Clear form function
+            function clearForm() {
+                document.getElementById('uploadForm').reset();
+                document.getElementById('filePreview').style.display = 'none';
+                document.querySelector('.char-count').textContent = '0/500 characters';
+                document.querySelector('.char-count').style.color = '#666';
+            }
+        </script>
+        <style>
+          .upload-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.upload-container h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#uploadForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-group label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.form-group input[type="file"],
+.form-group input[type="text"],
+.form-group textarea {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group input[type="file"] {
+    padding: 10px 20px;
+}
+
+.form-group input[type="text"]::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
+.form-group input[type="file"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.5);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    max-height: 200px;
+}
+
+.file-info,
+.char-count {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.file-preview {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.file-preview h4 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 15px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+#previewContent {
+    max-width: 100%;
+    max-height: 300px;
+    overflow: auto;
+    color: #fff;
+    font-size: 16px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.upload-btn,
+.clear-btn {
+    padding: 12px 30px;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.upload-btn {
+    background: linear-gradient(225deg, #ff6b6b, #4ecdc4);
+    color: #fff;
+}
+
+.clear-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.upload-btn:hover,
+.clear-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+.upload-btn:focus,
+.clear-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+}
+
+.upload-btn .btn-loading {
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .upload-container {
+        padding: 20px;
+    }
+
+    .upload-container h2 {
+        font-size: 28px;
+    }
+
+    .form-group label {
+        font-size: 16px;
+    }
+
+    .form-group input[type="file"],
+    .form-group input[type="text"],
+    .form-group textarea {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+
+    .file-info,
+    .char-count {
+        font-size: 12px;
+    }
+
+    .file-preview h4 {
+        font-size: 18px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .upload-btn,
+    .clear-btn {
+        width: 100%;
+        max-width: 350px;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-container {
+        padding: 15px;
+    }
+
+    .upload-container h2 {
+        font-size: 24px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input[type="file"],
+    .form-group input[type="text"],
+    .form-group textarea {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .file-preview {
+        padding: 15px;
+    }
+
+    .file-preview h4 {
+        font-size: 16px;
+    }
+
+    #previewContent {
+        font-size: 14px;
+    }
+
+    .upload-btn,
+    .clear-btn {
+        font-size: 13px;
+        padding: 8px 15px;
+    }
+}
+        </style>
+    </section>
+    
     <section id="account">
-
-       <h6><%= message %></h6>
+       <h6><%= userMessage %></h6>
+       <h6><%= userEmail %></h6>
         <% if (error) { %>
-            <p><%= error %></p>
+            <p class="error"><%= error %></p>
         <% } %>
-
     </section>
   </div>
 

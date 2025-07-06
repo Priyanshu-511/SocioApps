@@ -40,11 +40,15 @@ router.get('/', (req, res) => {
 
 router.get('/home', jsonmiddleAuth, async (req, res) => {
     try {
-        const uploads = await Upload.find({ userId: req.user._id })
+        // Get latest uploads from ALL users, not just the current user
+        const uploads = await Upload.find({})
+            .populate('userId', 'name email') // Get user info for each upload
             .sort({ createdAt: -1 })
             .limit(10);
+        
         res.render('home', { 
-            message: `Welcome, ${req.user.name}!`, 
+            userMessage: `Name: ${req.user.name}`, 
+            userEmail:`Email: ${req.user.email}`,
             error: null, 
             files: uploads 
         });
@@ -146,64 +150,100 @@ router.post('/logout', (req, res) => {
 
 router.post('/upload', jsonmiddleAuth, upload.single('file'), async (req, res) => {
     try {
+        console.log('Upload request received');
+        console.log('User:', req.user);
+        console.log('File:', req.file);
+        console.log('Body:', req.body);
+        
         if (!req.file) {
+            console.log('No file uploaded');
+            const uploads = await Upload.find({})
+                .populate('userId', 'name email')
+                .sort({ createdAt: -1 })
+                .limit(10);
             return res.render('home', { 
                 message: `Welcome, ${req.user.name}!`, 
                 error: 'No file uploaded or invalid file type', 
-                files: await Upload.find({ userId: req.user._id }).sort({ createdAt: -1 }).limit(10) 
+                files: uploads 
             });
         }
+        
         const { title, description } = req.body;
         if (!title || !description) {
+            console.log('Missing title or description');
+            const uploads = await Upload.find({})
+                .populate('userId', 'name email')
+                .sort({ createdAt: -1 })
+                .limit(10);
             return res.render('home', { 
                 message: `Welcome, ${req.user.name}!`, 
                 error: 'Title and description are required', 
-                files: await Upload.find({ userId: req.user._id }).sort({ createdAt: -1 }).limit(10) 
+                files: uploads 
             });
         }
 
+        // Create the upload entry
         const uploadEntry = new Upload({
-            userId: req.user._id,
+            userId: req.user.id, // Use req.user.id instead of req.user._id
             filename: req.file.filename,
             fileUrl: `/uploads/${req.file.filename}`,
             fileType: path.extname(req.file.filename).toLowerCase().replace('.', ''),
-            title,
-            description
+            title: title.trim(),
+            description: description.trim()
         });
 
+        console.log('Creating upload entry:', uploadEntry);
         await uploadEntry.save();
+        console.log('Upload saved successfully');
+        
+        // Redirect to home to show the updated list
         res.redirect('/home');
+        
     } catch (err) {
         console.error('Upload error:', err);
-        res.render('home', { 
-            message: `Welcome, ${req.user.name}!`, 
-            error: `Error uploading file: ${err.message}`, 
-            files: await Upload.find({ userId: req.user._id }).sort({ createdAt: -1 }).limit(10) 
-        });
+        console.error('Error stack:', err.stack);
+        
+        try {
+            const uploads = await Upload.find({})
+                .populate('userId', 'name email')
+                .sort({ createdAt: -1 })
+                .limit(10);
+            res.render('home', { 
+                message: `Welcome, ${req.user.name}!`, 
+                error: `Error uploading file: ${err.message}`, 
+                files: uploads 
+            });
+        } catch (renderErr) {
+            console.error('Error rendering home page:', renderErr);
+            res.status(500).send('Server error');
+        }
     }
 });
-
 router.get('/search', async (req, res) => {
   try {
     const { query, type } = req.query;
     let results = [];
     
+    console.log('Search request:', { query, type });
+    
     if (query) {
       if (type === 'users' || !type) {
-        // Search for users by username or email
+        // Search for users by name or email (fixed field names)
         const users = await User.find({
           $or: [
-            { username: { $regex: query, $options: 'i' } },
+            { name: { $regex: query, $options: 'i' } },
             { email: { $regex: query, $options: 'i' } }
           ]
-        }).select('username email profilePicture');
+        }).select('name email createdAt');
+        
+        console.log('Found users:', users.length);
         
         results = users.map(user => ({
           type: 'user',
           id: user._id,
-          username: user.username,
+          name: user.name,
           email: user.email,
-          profilePicture: user.profilePicture
+          createdAt: user.createdAt
         }));
       }
       
@@ -214,69 +254,192 @@ router.get('/search', async (req, res) => {
             { title: { $regex: query, $options: 'i' } },
             { description: { $regex: query, $options: 'i' } }
           ]
-        }).populate('uploadedBy', 'username');
+        }).populate('userId', 'name email');
+        
+        console.log('Found uploads:', uploads.length);
         
         const uploadResults = uploads.map(upload => ({
           type: 'upload',
           id: upload._id,
           title: upload.title,
           description: upload.description,
-          url: upload.url,
+          fileUrl: upload.fileUrl,
+          filename: upload.filename,
           fileType: upload.fileType,
-          uploadedBy: upload.uploadedBy.username,
-          uploadedAt: upload.uploadedAt
+          uploadedBy: upload.userId ? upload.userId.name : 'Unknown',
+          uploadedById: upload.userId ? upload.userId._id : null,
+          createdAt: upload.createdAt
         }));
         
         results = [...results, ...uploadResults];
       }
     }
     
-    res.json({ success: true, results });
+    console.log('Total results:', results.length);
+    res.json({ success: true, results, totalFound: results.length });
+    
   } catch (error) {
     console.error('Search error:', error);
-    res.status(500).json({ success: false, error: 'Search failed' });
+    res.status(500).json({ success: false, error: 'Search failed', details: error.message });
   }
 });
 
-// Get user profile and their uploads
+// Get user profile and their uploads (fixed field names)
 router.get('/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     
+    console.log('Getting user profile for:', userId);
+    
     // Get user details
-    const user = await User.findById(userId).select('username email profilePicture');
+    const user = await User.findById(userId).select('name email createdAt');
     if (!user) {
       return res.status(404).json({ success: false, error: 'User not found' });
     }
     
     // Get user's uploads
-    const uploads = await Upload.find({ uploadedBy: userId })
-      .sort({ uploadedAt: -1 })
+    const uploads = await Upload.find({ userId: userId })
+      .sort({ createdAt: -1 })
       .limit(20);
+    
+    console.log('Found uploads for user:', uploads.length);
     
     res.json({
       success: true,
       user: {
-        username: user.username,
+        id: user._id,
+        name: user.name,
         email: user.email,
-        profilePicture: user.profilePicture
+        createdAt: user.createdAt
       },
       uploads: uploads.map(upload => ({
         id: upload._id,
         title: upload.title,
         description: upload.description,
-        url: upload.url,
+        fileUrl: upload.fileUrl,
+        filename: upload.filename,
         fileType: upload.fileType,
-        uploadedAt: upload.uploadedAt
-      }))
+        createdAt: upload.createdAt
+      })),
+      totalUploads: uploads.length
     });
   } catch (error) {
     console.error('User profile error:', error);
-    res.status(500).json({ success: false, error: 'Failed to load user profile' });
+    res.status(500).json({ success: false, error: 'Failed to load user profile', details: error.message });
   }
 });
 
 
+// Add these debug routes to your PersonRoutes.js (temporary for debugging)
+
+// Debug route to check uploads in database
+router.get('/debug/uploads', jsonmiddleAuth, async (req, res) => {
+    try {
+        const uploads = await Upload.find({})
+            .populate('userId', 'name email')
+            .sort({ createdAt: -1 });
+        
+        res.json({
+            totalUploads: uploads.length,
+            uploads: uploads,
+            currentUser: req.user
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Debug route to check users in database
+router.get('/debug/users', jsonmiddleAuth, async (req, res) => {
+    try {
+        const users = await User.find({}).select('name email createdAt');
+        res.json({
+            totalUsers: users.length,
+            users: users,
+            currentUser: req.user
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Debug route to check file system
+router.get('/debug/files', jsonmiddleAuth, (req, res) => {
+    const uploadDir = path.join(__dirname, '../public/uploads');
+    try {
+        const files = fs.readdirSync(uploadDir);
+        res.json({
+            uploadDirectory: uploadDir,
+            filesInDirectory: files,
+            directoryExists: fs.existsSync(uploadDir)
+        });
+    } catch (err) {
+        res.json({
+            uploadDirectory: uploadDir,
+            error: err.message,
+            directoryExists: fs.existsSync(uploadDir)
+        });
+    }
+});
+
+// Add this debug route to your PersonRoutes.js
+
+router.get('/debug/search-test', jsonmiddleAuth, async (req, res) => {
+    try {
+        // Get all users
+        const allUsers = await User.find({}).select('name email createdAt');
+        
+        // Get all uploads
+        const allUploads = await Upload.find({}).populate('userId', 'name email');
+        
+        // Test search functionality
+        const testQuery = 'test'; // Change this to test different queries
+        
+        const userResults = await User.find({
+            $or: [
+                { name: { $regex: testQuery, $options: 'i' } },
+                { email: { $regex: testQuery, $options: 'i' } }
+            ]
+        }).select('name email createdAt');
+        
+        const uploadResults = await Upload.find({
+            $or: [
+                { title: { $regex: testQuery, $options: 'i' } },
+                { description: { $regex: testQuery, $options: 'i' } }
+            ]
+        }).populate('userId', 'name email');
+        
+        res.json({
+            database_status: {
+                totalUsers: allUsers.length,
+                totalUploads: allUploads.length,
+                users: allUsers.map(u => ({ id: u._id, name: u.name, email: u.email })),
+                uploads: allUploads.map(u => ({ 
+                    id: u._id, 
+                    title: u.title, 
+                    description: u.description,
+                    uploader: u.userId ? u.userId.name : 'No user'
+                }))
+            },
+            search_test: {
+                query: testQuery,
+                foundUsers: userResults.length,
+                foundUploads: uploadResults.length,
+                userResults: userResults.map(u => ({ name: u.name, email: u.email })),
+                uploadResults: uploadResults.map(u => ({ 
+                    title: u.title, 
+                    description: u.description,
+                    uploader: u.userId ? u.userId.name : 'No user'
+                }))
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            error: error.message,
+            stack: error.stack 
+        });
+    }
+});
 
 
 module.exports = router;
