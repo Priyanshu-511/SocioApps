@@ -41,9 +41,10 @@ SocioApps/
 │ └── authMiddleware.js # JWT verification
 ├── models/
 │ └── userModel.js # In-memory user model or schema
-├── views
+├── views/
 │ └── index.ejs
-│ └── HOME.ejs
+│ └── home.ejs
+├── public/
 ├── .env # Environment variables
 ├── .gitignore
 └── README.md
