@@ -69,7 +69,7 @@ must have to setup your enviroment file configuration by
 
 ```env
 PORT=5000
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your_jwt_secret_keys
 ```
 
 - Visit http://localhost:5000 in your browser
