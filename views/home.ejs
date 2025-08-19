@@ -34,7 +34,7 @@
                                 <p>📄 <a href="<%= file.fileUrl %>" target="_blank"><%= file.filename %></a></p>
                                 <span class="file-type">Text File</span>
                             </div>
-                        <% } else if (file.fileType === 'mp4') { %>
+                        <% } else if (file.fileType === 'mp4' || file.fileType === 'mkv') { %>
                             <div class="file-preview">
                                 <video src="<%= file.fileUrl %>" controls width="300" preload="metadata">
                                     Your browser does not support the video tag.
@@ -352,9 +352,9 @@
                     <input type="file" 
                            name="file" 
                            id="file"
-                           accept="image/*,video/mp4,text/plain" 
+                           accept="image/*,video/mp4,video/x-matroska,video/mkv,.mkv,text/plain" 
                            required>
-                    <small class="file-info">Supported formats: Images (JPG, PNG), Videos (MP4), Text files</small>
+                    <small class="file-info">Supported formats: Images (JPG, PNG), Videos (MP4, MKV), Text files</small>
                 </div>
                 
                 <div class="form-group">
@@ -411,7 +411,7 @@
                         img.style.maxHeight = '200px';
                         img.onload = () => URL.revokeObjectURL(img.src);
                         previewContent.appendChild(img);
-                    } else if (file.type === 'video/mp4') {
+                    } else if (file.type === 'video/mp4' || file.type === 'video/x-matroska' || file.name.toLowerCase().endsWith('.mkv')) {
                         const video = document.createElement('video');
                         video.src = URL.createObjectURL(file);
                         video.controls = true;
