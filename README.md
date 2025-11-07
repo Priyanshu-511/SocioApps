@@ -80,4 +80,4 @@ Deployed at
 - visit https://socioapps.onrender.com/ on your browser
 
 
-### note: It may be take more time to start due to inactivity timeout on render
+### note: It may be take more time to start due to inactivity timeout on render.
