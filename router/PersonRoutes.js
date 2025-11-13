@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
     fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|mp4|mkv|txt/;
+        const filetypes = /jpeg|jpg|png|mp4|mkv|txt|pdf|ppt|pptx/;
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 
         const allowedMimeTypes = [
@@ -34,15 +34,18 @@ const upload = multer({
             'video/mp4',
             'video/x-matroska', // ← NEW: MKV MIME type
             'video/mkv',        // ← NEW: Alternative MKV MIME type
-            'text/plain'
+            'text/plain',
+            'application/pdf',                                           // PDF
+            'application/vnd.ms-powerpoint',                            // PPT
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation'  // PPTX
         ];
 
 
-        const mimetype = filetypes.test(file.mimetype);
+        const mimetype = allowedMimeTypes.includes(file.mimetype);
         if (extname && mimetype) {
             return cb(null, true);
         }
-        cb('Error: Only images (JPEG, JPG, PNG), videos (MP4, MKV), or text files are allowed!');  // ← Added MKV to message
+        cb('Error: Only images (JPEG, JPG, PNG), videos (MP4, MKV), documents (PDF, PPT, PPTX), or text files are allowed!');
     }
 });
 
